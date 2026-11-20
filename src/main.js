@@ -104,6 +104,11 @@ applyTheme(document.documentElement.dataset.theme || "day");
 
 function turn(direction) {
   if (turning) return;
+  const current = pages[flip.getCurrentPageIndex()];
+  if (direction > 0 && current?.next?.id === "contents" && current.topicId) {
+    goTo("contents");
+    return;
+  }
   if (direction > 0) flip.flipNext();
   else flip.flipPrev();
 }
@@ -140,8 +145,10 @@ function sync(index) {
     else board.hide();
   }
   label.textContent = pageLabel(page);
+  const here = pages[index];
+  const backToContents = here?.topicId && here.next?.id === "contents";
   prevButton.disabled = index === 0;
-  nextButton.disabled = visible.has(pages[pages.length - 1].id);
+  nextButton.disabled = !backToContents && visible.has(pages[pages.length - 1].id);
   const nextHash = `#${page.id}`;
   if (location.hash !== nextHash) history.replaceState(null, "", nextHash);
 }
@@ -154,7 +161,6 @@ function visibleIds(index) {
 
 function pageLabel(page) {
   if (page.layout === "cover") return "Cover";
-  if (page.layout === "back") return "End";
   const name = page.header && page.header !== book.title ? page.header : page.title;
   return page.folio ? `${name}  ·  ${page.folio}` : name;
 }

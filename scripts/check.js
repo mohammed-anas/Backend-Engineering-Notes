@@ -10,13 +10,13 @@ if (ids.size !== pages.length) {
   process.exit(1);
 }
 
-if (pages.at(0).layout !== "cover" || pages.at(-1).layout !== "back") {
-  console.error("The book should open on a cover and close on a cover");
+if (pages.at(0).layout !== "cover") {
+  console.error("The book should open on a cover");
   process.exit(1);
 }
 
-if (pages.length % 2 !== 0) {
-  console.error("Page count should be even so the back cover sits alone");
+if (pages.some((page) => page.layout === "back" || page.layout === "endpaper")) {
+  console.error("A finished topic returns to the contents, not a closing leaf");
   process.exit(1);
 }
 

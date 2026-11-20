@@ -2,7 +2,7 @@
 const book = {
   title: "Software Engineering Notes",
   subtitle: "Software engineering, short enough to reread.",
-  volume: "Volume 01",
+  author: "Mohammed Anas",
   front: [
     {
       id: "how-to-read",

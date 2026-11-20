@@ -97,24 +97,6 @@ export function compose(book, topics) {
     }
   }
 
-  if (pages.length % 2 === 0) {
-    add({
-      id: "endpaper",
-      layout: "endpaper",
-      numbering: "none",
-      title: "Blank leaf",
-      header: book.title,
-    });
-  }
-
-  add({
-    id: "back",
-    layout: "back",
-    density: "hard",
-    numbering: "none",
-    title: "Close the book",
-  });
-
   const seen = new Set();
   for (const page of pages) {
     if (seen.has(page.id)) throw new Error(`Duplicate page id "${page.id}"`);
@@ -156,6 +138,14 @@ export function compose(book, topics) {
   for (let i = 0; i < readable.length - 1; i += 1) {
     const next = readable[i + 1];
     readable[i].next = { id: next.id, title: next.title };
+  }
+
+  const lastOfTopic = new Map();
+  for (const page of pages) {
+    if (page.topicId) lastOfTopic.set(page.topicId, page);
+  }
+  for (const page of lastOfTopic.values()) {
+    page.next = { id: "contents", title: "Contents" };
   }
 
   for (const page of pages) {

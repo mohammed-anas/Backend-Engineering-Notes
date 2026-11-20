@@ -15,7 +15,7 @@ Open the address Vite prints. Contents and each chapter index jump to a page. Th
 npm run check
 ```
 
-That checks the page list: unique ids, links that resolve, and a back cover that sits on its own leaf.
+That checks the page list: unique ids and links that resolve. The last page of a topic returns to the contents.
 
 ## Add a topic
 

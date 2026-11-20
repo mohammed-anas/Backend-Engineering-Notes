@@ -15,33 +15,14 @@ const layouts = {
   cover(page, book) {
     return `<div class="cover">
       <div class="cover-frame">
-        <p class="cover-series">${escapeHtml(book.volume)}</p>
         <p class="cover-mark" aria-hidden="true">SE</p>
         <h1>${escapeHtml(book.title)}</h1>
         <p class="cover-sub">${escapeHtml(book.subtitle)}</p>
         <div class="cover-rule" aria-hidden="true"></div>
+        <p class="cover-author">${escapeHtml(book.author)}</p>
         <p class="cover-opens">Opens on Redis</p>
       </div>
     </div>`;
-  },
-  back(page, book) {
-    return `<div class="cover cover-back">
-      <div class="cover-frame">
-        <p class="cover-series">${escapeHtml(book.volume)}</p>
-        <p class="back-kicker">End</p>
-        <h2>${escapeHtml(book.title)}</h2>
-        <p class="back-copy">The board is a sorted set. Redis, used as a leaderboard. Top ten, your rank, and a point added without losing the one that landed a moment earlier.</p>
-        <p class="back-copy">The next topic is a file in <span class="path">content/topics</span>.</p>
-      </div>
-    </div>`;
-  },
-  endpaper(page) {
-    return sheet(
-      page,
-      `<div class="endpaper-body">
-        <p>The rest of this volume is still blank.</p>
-      </div>`,
-    );
   },
   opener(page) {
     const chapters = page.chapters
@@ -108,7 +89,13 @@ const layouts = {
 
 function sheet(page, body) {
   const foot = page.next
-    ? `<footer class="sheet-foot">${goto(page.next.id, "next-hint", `<span>Next</span><strong>${escapeHtml(page.next.title)}</strong>`)}</footer>`
+    ? `<footer class="sheet-foot">${goto(
+        page.next.id,
+        "next-hint",
+        page.next.id === "contents"
+          ? `<span>Return</span><strong>Contents</strong>`
+          : `<span>Next</span><strong>${escapeHtml(page.next.title)}</strong>`,
+      )}</footer>`
     : `<footer class="sheet-foot"></footer>`;
   return `<article class="sheet">
     <header class="sheet-head">

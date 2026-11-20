@@ -926,6 +926,13 @@ html[data-theme="night"] .lamp {
   line-height: 1.08;
 }
 
+.cover-author {
+  margin: 0.85rem 0 0;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--foil);
+}
+
 .cover-sub,
 .back-copy {
   margin: 0.75rem 0 0;
