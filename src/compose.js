@@ -13,7 +13,6 @@ const BLOCKS = new Set([
 ]);
 
 const CONTENTS_BUDGET = 14;
-const SUBINDEX_BUDGET = 9;
 
 export function compose(book, topics) {
   validate(book, topics);
@@ -66,24 +65,11 @@ export function compose(book, topics) {
       kicker: plan.topic.eyebrow,
       header: plan.topic.title,
       blurb: plan.topic.blurb,
-      indexId: plan.subindexIds[0],
       chapters: plan.topic.chapters.map((chapter) => ({
         id: chapter.pages[0].id,
         title: chapter.title,
         promise: chapter.promise,
       })),
-    });
-
-    plan.subindexChunks.forEach((groups, index) => {
-      add({
-        id: plan.subindexIds[index],
-        layout: "subindex",
-        numbering: "arabic",
-        title: index === 0 ? "In this chapter" : "In this chapter, continued",
-        kicker: plan.topic.title,
-        header: plan.topic.title,
-        groups,
-      });
     });
 
     for (const chapter of plan.topic.chapters) {
@@ -118,19 +104,16 @@ export function compose(book, topics) {
   for (const page of contentsSlots) {
     for (const entry of page.entries) {
       entry.folio = byId.get(entry.id)?.folio || "";
-      entry.indexFolio = byId.get(entry.indexId)?.folio || "";
-      for (const lesson of entry.lessons) {
-        lesson.folio = byId.get(lesson.id)?.folio || "";
+      for (const chapter of entry.chapters) {
+        chapter.folio = byId.get(chapter.id)?.folio || "";
       }
     }
   }
 
   for (const page of pages) {
-    if (page.layout !== "subindex") continue;
-    for (const group of page.groups) {
-      for (const row of group.rows) {
-        row.folio = byId.get(row.id)?.folio || "";
-      }
+    if (page.layout !== "opener") continue;
+    for (const chapter of page.chapters) {
+      chapter.folio = byId.get(chapter.id)?.folio || "";
     }
   }
 
@@ -178,134 +161,37 @@ function lessonPage(source, header, numbering) {
 }
 
 function planTopic(topic) {
-  const subindexChunks = paginateSubindex(topic);
   return {
     topic,
     openerId: `${topic.id}-open`,
-    subindexIds: subindexChunks.map((_, index) =>
-      index === 0 ? `${topic.id}-index` : `${topic.id}-index-${index + 1}`,
-    ),
-    subindexChunks,
   };
 }
 
 function paginateContents(plans) {
-  const topics = plans.map((plan) => ({
+  const entries = plans.map((plan) => ({
     id: plan.openerId,
-    indexId: plan.subindexIds[0],
     title: plan.topic.title,
     eyebrow: plan.topic.eyebrow,
-    lessons: plan.topic.chapters.flatMap((chapter) =>
-      chapter.pages.map((page) => ({
-        id: page.id,
-        title: page.title,
-        chapter: chapter.title,
-      })),
-    ),
+    chapters: plan.topic.chapters.map((chapter) => ({
+      id: chapter.pages[0].id,
+      title: chapter.title,
+      promise: chapter.promise,
+    })),
   }));
 
   const chunks = [];
-  let current = [];
-  let used = 0;
-
-  const flush = () => {
-    if (!current.length) return;
-    chunks.push(current);
-    current = [];
-    used = 0;
-  };
-
-  for (const topic of topics) {
-    let offset = 0;
-    let part = 0;
-    while (offset < topic.lessons.length) {
-      const room = CONTENTS_BUDGET - used;
-      if (room < 3) {
-        flush();
-        continue;
-      }
-      const take = Math.min(topic.lessons.length - offset, room - 2);
-      current.push({
-        id: topic.id,
-        indexId: topic.indexId,
-        title: topic.title,
-        eyebrow: topic.eyebrow,
-        continued: part > 0,
-        lessons: topic.lessons.slice(offset, offset + take),
-      });
-      used += 2 + take;
-      offset += take;
-      part += 1;
-      if (offset < topic.lessons.length) flush();
-    }
+  for (let index = 0; index < entries.length; index += CONTENTS_BUDGET) {
+    chunks.push(entries.slice(index, index + CONTENTS_BUDGET));
   }
-  flush();
   return chunks.length ? chunks : [[]];
-}
-
-function paginateSubindex(topic) {
-  const rows = topic.chapters.flatMap((chapter) =>
-    chapter.pages.map((page, index) => ({
-      chapterId: chapter.id,
-      chapter: chapter.title,
-      promise: chapter.promise,
-      showChapter: index === 0,
-      id: page.id,
-      title: page.title,
-    })),
-  );
-
-  const chunks = [];
-  let current = [];
-  let used = 0;
-  let lastChapter = "";
-
-  const flush = () => {
-    if (!current.length) return;
-    chunks.push(groupRows(current));
-    current = [];
-    used = 0;
-  };
-
-  for (const row of rows) {
-    const cost = row.showChapter || row.chapterId !== lastChapter ? 2 : 1;
-    if (used && used + cost > SUBINDEX_BUDGET) flush();
-    current.push({
-      ...row,
-      showChapter: row.showChapter || row.chapterId !== lastChapter || current.length === 0,
-    });
-    used += current[current.length - 1].showChapter ? 2 : 1;
-    lastChapter = row.chapterId;
-  }
-  flush();
-  return chunks.length ? chunks : [[]];
-}
-
-function groupRows(rows) {
-  const groups = [];
-  for (const row of rows) {
-    if (row.showChapter || !groups.length || groups[groups.length - 1].chapterId !== row.chapterId) {
-      groups.push({
-        chapterId: row.chapterId,
-        title: row.chapter,
-        promise: row.promise,
-        rows: [],
-      });
-    }
-    groups[groups.length - 1].rows.push({ id: row.id, title: row.title });
-  }
-  return groups;
 }
 
 function collectLinks(page) {
   const links = [];
   if (page.next) links.push(page.next.id);
-  if (page.indexId) links.push(page.indexId);
   for (const chapter of page.chapters || []) links.push(chapter.id);
   for (const entry of page.entries || []) {
-    links.push(entry.id);
-    if (entry.indexId) links.push(entry.indexId);
-    for (const lesson of entry.lessons || []) links.push(lesson.id);
+    for (const chapter of entry.chapters || []) links.push(chapter.id);
   }
   for (const group of page.groups || []) {
     for (const row of group.rows) links.push(row.id);
@@ -341,7 +227,6 @@ function validate(book, topics) {
     if (!/^[a-z0-9-]+$/.test(topic.id)) {
       throw new Error(`Topic id "${topic.id}" should be lowercase letters, numbers, and dashes`);
     }
-    ids.add(`${topic.id}-index`);
     if (!topic.chapters.length) throw new Error(`Topic "${topic.id}" has no chapters`);
 
     for (const chapter of topic.chapters) {

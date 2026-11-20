@@ -16,6 +16,16 @@ const nextButton = document.getElementById("next");
 const themeButton = document.getElementById("theme");
 const themeLabel = document.getElementById("theme-label");
 const themeColor = document.getElementById("theme-color");
+const closeButton = document.getElementById("close");
+const contentsButton = document.getElementById("contents");
+const SHUT_LINES = [
+  "The margin can hold your place. Go bother the kettle.",
+  "Shut. The clever part will still be clever after sleep.",
+  "Enough for one sitting. The book does not sulk.",
+  "Close it. Tomorrow is a perfectly good bookmark.",
+  "The book is patient. You have had a day.",
+];
+let shutting = false;
 
 root.innerHTML = renderBook(model);
 
@@ -61,6 +71,7 @@ flip.on("changeState", (event) => {
 });
 
 document.getElementById("contents").addEventListener("click", () => goTo("contents"));
+closeButton.addEventListener("click", closeBook);
 prevButton.addEventListener("click", () => turn(-1));
 nextButton.addEventListener("click", () => turn(1));
 themeButton.addEventListener("click", () => {
@@ -73,6 +84,11 @@ root.addEventListener("click", (event) => {
   if (recall) {
     const open = recall.classList.toggle("is-open");
     recall.setAttribute("aria-expanded", open ? "true" : "false");
+    return;
+  }
+  const topic = event.target.closest(".toc-topic-link");
+  if (topic) {
+    openTopic(topic);
     return;
   }
   const target = event.target.closest("[data-goto]");
@@ -90,6 +106,12 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "Home") {
     event.preventDefault();
     goTo("cover");
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    closeBook();
+  } else if (event.key === "i" || event.key === "I") {
+    event.preventDefault();
+    goTo("contents");
   }
 });
 
@@ -101,6 +123,29 @@ window.addEventListener("hashchange", () => {
 });
 
 applyTheme(document.documentElement.dataset.theme || "day");
+
+function openTopic(button) {
+  const section = button.closest(".toc-topic");
+  const list = section.parentElement;
+  const wasOpen = section.classList.contains("is-open");
+  for (const item of list.querySelectorAll(".toc-topic")) {
+    item.classList.remove("is-open");
+    item.querySelector(".toc-topic-link").setAttribute("aria-expanded", "false");
+    const chapters = item.querySelector(".toc-chapters");
+    if (chapters) chapters.hidden = true;
+  }
+  if (wasOpen) return;
+  list.prepend(section);
+  section.classList.add("is-open");
+  button.setAttribute("aria-expanded", "true");
+  section.querySelector(".toc-chapters").hidden = false;
+}
+
+function closeBook() {
+  if (turning || flip.getCurrentPageIndex() === 0) return;
+  shutting = true;
+  flip.turnToPage(0);
+}
 
 function turn(direction) {
   if (turning) return;
@@ -120,7 +165,7 @@ function goTo(id) {
   if (visibleIds(current).includes(page.id)) return;
   const distance = Math.abs(page.index - current);
   const oneTurn = distance <= (flip.getOrientation() === "portrait" ? 1 : 3);
-  if (!oneTurn) {
+  if (page.layout === "contents" || !oneTurn) {
     flip.turnToPage(page.index);
     return;
   }
@@ -145,6 +190,16 @@ function sync(index) {
     else board.hide();
   }
   label.textContent = pageLabel(page);
+  closeButton.hidden = index === 0;
+  contentsButton.hidden = page.layout === "contents";
+  const note = document.querySelector(".cover-quit");
+  if (page.layout === "cover" && shutting) {
+    note.textContent = SHUT_LINES[Math.floor(Math.random() * SHUT_LINES.length)];
+    note.hidden = false;
+    shutting = false;
+  } else if (page.layout !== "cover") {
+    note.hidden = true;
+  }
   const here = pages[index];
   const backToContents = here?.topicId && here.next?.id === "contents";
   prevButton.disabled = index === 0;

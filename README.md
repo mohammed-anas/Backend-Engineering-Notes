@@ -1,6 +1,6 @@
-# Software Engineering Notes
+# Backend Engineering Notes
 
-A short book of software engineering, made to be reread rather than studied. The paper warms for night reading. Pages turn. The first chapter is Redis, used as a leaderboard.
+A short book of backend engineering, made to be reread rather than studied. The paper warms for night reading. Pages turn. The first chapter is Redis, used as a leaderboard.
 
 ## Read it
 

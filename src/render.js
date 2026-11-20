@@ -17,6 +17,7 @@ const layouts = {
       <img class="cover-art" src="./cover.jpg" alt="" />
       <div class="cover-shade" aria-hidden="true"></div>
       <div class="cover-frame">
+        <p class="cover-quit" hidden aria-live="polite"></p>
         <p class="cover-mark" aria-hidden="true">SE</p>
         <h1>${escapeHtml(book.title)}</h1>
         <p class="cover-sub">${escapeHtml(book.subtitle)}</p>
@@ -40,7 +41,6 @@ const layouts = {
         <h2 class="opener-title">${escapeHtml(page.title)}</h2>
         <p class="opener-blurb">${escapeHtml(page.blurb)}</p>
         <ol class="opener-chapters">${chapters}</ol>
-        ${goto(page.indexId, "quiet-link", "Chapter index")}
       </div>`,
     );
   },
@@ -94,14 +94,16 @@ function sheet(page, body) {
         page.next.id,
         "next-hint",
         page.next.id === "contents"
-          ? `<span>Return</span><strong>Contents</strong>`
+          ? `<span>Return</span><strong>Index</strong>`
           : `<span>Next</span><strong>${escapeHtml(page.next.title)}</strong>`,
       )}</footer>`
     : `<footer class="sheet-foot"></footer>`;
+  const index =
+    page.layout === "contents" ? "" : goto("contents", "index-jump", "Index");
   return `<article class="sheet">
     <header class="sheet-head">
       <span class="running">${escapeHtml(page.header || "")}</span>
-      <span class="folio">${escapeHtml(page.folio || "")}</span>
+      <span class="sheet-meta">${index}<span class="folio">${escapeHtml(page.folio || "")}</span></span>
     </header>
     <div class="page-body">${body}</div>
     ${foot}
@@ -109,39 +111,22 @@ function sheet(page, body) {
 }
 
 function renderContentsTopic(entry) {
-  const groups = [];
-  for (const lesson of entry.lessons) {
-    const last = groups[groups.length - 1];
-    if (!last || last.chapter !== lesson.chapter) {
-      groups.push({ chapter: lesson.chapter, lessons: [lesson] });
-    } else {
-      last.lessons.push(lesson);
-    }
-  }
-  const body = groups
+  const chapters = (entry.chapters || [])
     .map(
-      (group) => `<p class="toc-chapter">${escapeHtml(group.chapter)}</p>
-        <ol>
-          ${group.lessons
-            .map(
-              (lesson) =>
-                `<li>${goto(lesson.id, "toc-link", `<span class="toc-name">${escapeHtml(lesson.title)}</span><span class="toc-leader" aria-hidden="true"></span><span class="toc-folio">${escapeHtml(lesson.folio)}</span>`)}</li>`,
-            )
-            .join("")}
-        </ol>`,
+      (chapter) => `<li>${goto(
+        chapter.id,
+        "toc-link",
+        `<span class="toc-name">${escapeHtml(chapter.title)}</span><span class="toc-leader" aria-hidden="true"></span><span class="toc-folio">${escapeHtml(chapter.folio || "")}</span>`,
+      )}</li>`,
     )
     .join("");
-  const index = entry.continued
-    ? ""
-    : goto(
-        entry.indexId,
-        "toc-link toc-index-link",
-        `<span class="toc-name">Chapter index</span><span class="toc-leader" aria-hidden="true"></span><span class="toc-folio">${escapeHtml(entry.indexFolio)}</span>`,
-      );
   return `<section class="toc-topic">
-    ${goto(entry.id, "toc-topic-link", `<span><span class="toc-eyebrow">${escapeHtml(entry.eyebrow)}</span><span class="toc-topic-name">${escapeHtml(entry.title)}${entry.continued ? ", continued" : ""}</span></span><span class="toc-leader" aria-hidden="true"></span><span class="toc-folio">${escapeHtml(entry.folio)}</span>`)}
-    ${index}
-    ${body}
+    <button type="button" class="toc-topic-link" aria-expanded="false">
+      <span><span class="toc-eyebrow">${escapeHtml(entry.eyebrow)}</span><span class="toc-topic-name">${escapeHtml(entry.title)}</span></span>
+      <span class="toc-leader" aria-hidden="true"></span>
+      <span class="toc-folio">${escapeHtml(entry.folio || "")}</span>
+    </button>
+    <ol class="toc-chapters" hidden>${chapters}</ol>
   </section>`;
 }
 

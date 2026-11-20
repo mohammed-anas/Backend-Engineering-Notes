@@ -122,7 +122,14 @@ button {
 }
 
 .pager {
+  justify-content: flex-end;
   padding: 0.15rem 1.3rem 0.9rem;
+}
+
+.pager-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .brand {
@@ -209,7 +216,7 @@ html[data-theme="night"] .lamp {
 }
 
 .pager-hint {
-  margin: 0;
+  margin: 0 auto 0 0;
   font-size: 0.82rem;
 }
 
@@ -314,6 +321,21 @@ html[data-theme="night"] .lamp {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--faint);
+}
+
+.sheet-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex: none;
+}
+
+.index-jump {
+  color: var(--accent);
+}
+
+.index-jump:hover {
+  color: var(--ink);
 }
 
 .folio {
@@ -752,6 +774,15 @@ html[data-theme="night"] .lamp {
   color: var(--accent);
 }
 
+.toc-chapters {
+  margin: 0.35rem 0 0.85rem;
+  padding-left: 0.85rem;
+}
+
+.toc-topic.is-open .toc-topic-name {
+  color: var(--accent);
+}
+
 .toc ol,
 .subindex-group ol,
 .opener-chapters {
@@ -921,6 +952,23 @@ html[data-theme="night"] .cover-shade {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--foil);
+}
+
+.cover-quit {
+  align-self: flex-start;
+  margin: 0 0 0.85rem;
+  max-width: 15rem;
+  padding: 0.5rem 0.7rem 0.55rem;
+  border-radius: 2px;
+  background: #f6efe4;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  text-wrap: pretty;
+  color: #2c241c;
+  transform: rotate(-1.5deg);
 }
 
 .cover-mark {
