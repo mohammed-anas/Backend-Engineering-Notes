@@ -27,20 +27,21 @@ const flip = new PageFlip(root, {
   maxWidth: 560,
   minHeight: 400,
   maxHeight: 760,
-  drawShadow: true,
-  maxShadowOpacity: 0.32,
-  flippingTime: 780,
+  drawShadow: false,
+  maxShadowOpacity: 0,
+  flippingTime: 320,
   usePortrait: true,
-  autoSize: true,
+  autoSize: false,
   showCover: true,
   mobileScrollSupport: false,
   swipeDistance: 30,
   clickEventForward: true,
   useMouseEvents: true,
-  showPageCorners: true,
+  showPageCorners: false,
   disableFlipByClick: false,
   startZIndex: 8,
 });
+let turning = false;
 
 flip.loadFromHTML(root.querySelectorAll(".page"));
 const boards = mountLeaderboards(root);
@@ -54,10 +55,14 @@ if (pages.some((page) => page.id === hash)) {
 flip.on("flip", (event) => sync(event.data));
 flip.on("init", () => sync(flip.getCurrentPageIndex()));
 flip.on("changeOrientation", () => sync(flip.getCurrentPageIndex()));
+flip.on("changeState", (event) => {
+  turning = event.data === "flipping" || event.data === "user_fold";
+  root.classList.toggle("is-turning", turning);
+});
 
 document.getElementById("contents").addEventListener("click", () => goTo("contents"));
-prevButton.addEventListener("click", () => flip.flipPrev());
-nextButton.addEventListener("click", () => flip.flipNext());
+prevButton.addEventListener("click", () => turn(-1));
+nextButton.addEventListener("click", () => turn(1));
 themeButton.addEventListener("click", () => {
   const next = document.documentElement.dataset.theme === "night" ? "day" : "night";
   applyTheme(next);
@@ -78,10 +83,10 @@ document.addEventListener("keydown", (event) => {
   if (event.metaKey || event.ctrlKey || event.altKey) return;
   if (event.key === "ArrowRight" || event.key === "ArrowDown") {
     event.preventDefault();
-    flip.flipNext();
+    turn(1);
   } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
     event.preventDefault();
-    flip.flipPrev();
+    turn(-1);
   } else if (event.key === "Home") {
     event.preventDefault();
     goTo("cover");
@@ -97,16 +102,25 @@ window.addEventListener("hashchange", () => {
 
 applyTheme(document.documentElement.dataset.theme || "day");
 
+function turn(direction) {
+  if (turning) return;
+  if (direction > 0) flip.flipNext();
+  else flip.flipPrev();
+}
+
 function goTo(id) {
   const page = pages.find((item) => item.id === id);
-  if (!page) return;
+  if (!page || turning) return;
   const current = flip.getCurrentPageIndex();
-  if (page.index === current) return;
-  try {
-    flip.flip(page.index);
-  } catch {
+  if (visibleIds(current).includes(page.id)) return;
+  const distance = Math.abs(page.index - current);
+  const oneTurn = distance <= (flip.getOrientation() === "portrait" ? 1 : 3);
+  if (!oneTurn) {
     flip.turnToPage(page.index);
+    return;
   }
+  if (page.index > current) flip.flipNext();
+  else flip.flipPrev();
 }
 
 function sync(index) {
