@@ -14,13 +14,14 @@ function renderPage(page, book) {
 const layouts = {
   cover(page, book) {
     return `<div class="cover">
+      <img class="cover-art" src="./cover.jpg" alt="" />
+      <div class="cover-shade" aria-hidden="true"></div>
       <div class="cover-frame">
         <p class="cover-mark" aria-hidden="true">SE</p>
         <h1>${escapeHtml(book.title)}</h1>
         <p class="cover-sub">${escapeHtml(book.subtitle)}</p>
         <div class="cover-rule" aria-hidden="true"></div>
         <p class="cover-author">${escapeHtml(book.author)}</p>
-        <p class="cover-opens">Opens on Redis</p>
       </div>
     </div>`;
   },

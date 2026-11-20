@@ -869,24 +869,50 @@ html[data-theme="night"] .lamp {
 }
 
 .cover {
+  position: relative;
   height: 100%;
-  padding: 0.7rem;
-  color: #f4eadf;
+  overflow: hidden;
+  color: #f7f1e8;
+  background: #2a241c;
+}
+
+.cover-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  filter: saturate(1.04) contrast(1.02);
+}
+
+.cover-shade {
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(90% 55% at 0% 0%, rgba(255, 255, 255, 0.07), transparent 46%),
-    linear-gradient(168deg, #263449 0%, #1b2838 48%, #141e2b 100%);
+    linear-gradient(180deg, rgba(42, 32, 22, 0.08) 0%, rgba(42, 32, 22, 0.02) 38%, rgba(28, 20, 14, 0.55) 62%, rgba(18, 13, 9, 0.9) 100%);
+}
+
+html[data-theme="night"] .cover-art {
+  filter: brightness(0.62) saturate(0.78) contrast(1.06);
+}
+
+html[data-theme="night"] .cover-shade {
+  background:
+    linear-gradient(180deg, rgba(8, 7, 6, 0.28) 0%, rgba(8, 7, 6, 0.18) 36%, rgba(6, 5, 4, 0.72) 62%, rgba(4, 3, 2, 0.94) 100%);
 }
 
 .cover-frame {
+  position: relative;
+  z-index: 1;
   height: 100%;
-  border: 1px solid rgba(230, 196, 154, 0.45);
-  padding: 1.35rem 1.2rem 1.2rem;
+  padding: 1.15rem 1.15rem 1.2rem;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 }
 
 .cover-series,
-.cover-opens,
 .back-kicker {
   margin: 0;
   font-family: var(--sans);
@@ -898,9 +924,9 @@ html[data-theme="night"] .lamp {
 }
 
 .cover-mark {
-  width: 3.1rem;
-  height: 3.1rem;
-  margin: 1.4rem 0 auto;
+  width: 2.35rem;
+  height: 2.35rem;
+  margin: 0 0 0.75rem;
   display: grid;
   place-items: center;
   border: 1px solid rgba(230, 196, 154, 0.7);
@@ -908,6 +934,7 @@ html[data-theme="night"] .lamp {
   font-family: var(--serif);
   color: var(--foil);
   letter-spacing: 0.06em;
+  background: rgba(18, 13, 9, 0.35);
 }
 
 .cover h1,
@@ -951,10 +978,6 @@ html[data-theme="night"] .lamp {
   background: var(--foil);
   transform-origin: left center;
   animation: draw 1.3s ease both;
-}
-
-.cover-opens {
-  margin-top: auto;
 }
 
 .cover-back h2 {
