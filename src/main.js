@@ -5,7 +5,7 @@ import { compose } from "./compose.js";
 import { mountLeaderboards } from "./leaderboard.js";
 import { renderBook } from "./render.js";
 
-const THEME_KEY = "evening-notes-theme";
+const THEME_KEY = "se-notes-theme";
 const model = compose(book, topics);
 const pages = model.pages;
 

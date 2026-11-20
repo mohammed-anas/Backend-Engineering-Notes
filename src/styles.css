@@ -127,8 +127,10 @@ button {
 
 .brand {
   margin: 0;
+  max-width: 16rem;
   font-weight: 520;
   letter-spacing: 0.01em;
+  line-height: 1.25;
 }
 
 .brand span,
@@ -906,8 +908,9 @@ html[data-theme="night"] .lamp {
 }
 
 .cover h1 {
-  font-size: 2.85rem;
-  line-height: 0.92;
+  max-width: 7.4em;
+  font-size: 2.15rem;
+  line-height: 1.08;
 }
 
 .cover-sub,
@@ -936,7 +939,8 @@ html[data-theme="night"] .lamp {
 
 .cover-back h2 {
   margin-top: auto;
-  font-size: 2rem;
+  max-width: 9em;
+  font-size: 1.7rem;
   line-height: 1.15;
 }
 

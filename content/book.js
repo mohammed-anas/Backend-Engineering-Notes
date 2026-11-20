@@ -1,6 +1,6 @@
 /** Book-wide pages. Topics live in content/topics and are registered next door. */
 const book = {
-  title: "Evening Notes",
+  title: "Software Engineering Notes",
   subtitle: "Software engineering, short enough to reread.",
   volume: "Volume 01",
   front: [

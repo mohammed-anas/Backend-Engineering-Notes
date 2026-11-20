@@ -16,7 +16,7 @@ const layouts = {
     return `<div class="cover">
       <div class="cover-frame">
         <p class="cover-series">${escapeHtml(book.volume)}</p>
-        <p class="cover-mark" aria-hidden="true">En</p>
+        <p class="cover-mark" aria-hidden="true">SE</p>
         <h1>${escapeHtml(book.title)}</h1>
         <p class="cover-sub">${escapeHtml(book.subtitle)}</p>
         <div class="cover-rule" aria-hidden="true"></div>
@@ -29,8 +29,8 @@ const layouts = {
       <div class="cover-frame">
         <p class="cover-series">${escapeHtml(book.volume)}</p>
         <p class="back-kicker">End</p>
-        <h2>The board is a sorted set.</h2>
-        <p class="back-copy">Redis, used as a leaderboard. Top ten, your rank, and a point added without losing the one that landed a moment earlier.</p>
+        <h2>${escapeHtml(book.title)}</h2>
+        <p class="back-copy">The board is a sorted set. Redis, used as a leaderboard. Top ten, your rank, and a point added without losing the one that landed a moment earlier.</p>
         <p class="back-copy">The next topic is a file in <span class="path">content/topics</span>.</p>
       </div>
     </div>`;

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Evening Notes</title>
+    <title>Software Engineering Notes</title>
     <meta
       name="description"
       content="A short, readable book of software engineering. First chapter: Redis as a leaderboard."
@@ -18,7 +18,7 @@
     />
     <script>
       try {
-        var saved = localStorage.getItem("evening-notes-theme");
+        var saved = localStorage.getItem("se-notes-theme");
         var theme =
           saved ||
           (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day");
@@ -30,7 +30,7 @@
   <body>
     <div class="stage">
       <header class="chrome">
-        <p class="brand">Evening Notes <span>Volume 01</span></p>
+        <p class="brand">Software Engineering Notes <span>Volume 01</span></p>
         <p id="page-label" class="page-label" aria-live="polite">Cover</p>
         <div class="chrome-actions">
           <button type="button" id="contents">Contents</button>
@@ -41,7 +41,7 @@
         </div>
       </header>
       <div class="book-wrap">
-        <div id="book" aria-label="Evening Notes"></div>
+        <div id="book" aria-label="Software Engineering Notes"></div>
       </div>
       <nav class="pager" aria-label="Turn the page">
         <button type="button" id="prev" aria-label="Previous page">

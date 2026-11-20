@@ -1,4 +1,4 @@
-# Evening Notes
+# Software Engineering Notes
 
 A short book of software engineering, made to be reread rather than studied. The paper warms for night reading. Pages turn. The first chapter is Redis, used as a leaderboard.
 
